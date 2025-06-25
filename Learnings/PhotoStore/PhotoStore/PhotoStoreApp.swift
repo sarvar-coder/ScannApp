@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct PhotoStoreApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabBarView()
         }
+        .modelContainer(for: Photo.self)
     }
 }

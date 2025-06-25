@@ -7,11 +7,16 @@
 
 import SwiftUI
 import PhotosUI
+import SwiftData
+import UIKit
 
 struct ContentView: View {
     @State private var processedImage: Image?
     @State private var filterIntensity = 0.5
     @State private var selectedItem: PhotosPickerItem?
+    
+    @Environment(\.modelContext) var modelContext
+    @Query var photos: [Photo]
     
     // button title Change
     @State private var buttonState = false
@@ -32,19 +37,20 @@ struct ContentView: View {
                 }
                 
                 Button {
-                    buttonState.toggle()
-                    if buttonState {
-                        print("Save")
-                    } else {
-                        print("Unsave")
-                    }
+                    //                    buttonState.toggle()
+                    //                    if buttonState {
+                    //                        print("Save")
+                    //                    } else {
+                    //                        print("Unsave")
+                    //                    }
+                    save()
                 } label: {
-                    Text(buttonState ? "UnSave" : "Save")
+                    Text("Save")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
                 
- 
+                
             }
             .padding()
             .navigationTitle("Photo")
@@ -79,10 +85,23 @@ struct ContentView: View {
         Task {
             guard let imageData = try await selectedItem?.loadTransferable(type: Data.self) else { return }
             
+            let photo = Photo(data: imageData)
+            modelContext.insert(photo)
+            
+            
             guard let inputImage = UIImage(data: imageData) else { return }
             
             self.processedImage = Image(uiImage: inputImage)
         }
+    }
+    
+    func save() {
+        
+        let image = UIImage(named: "photo")
+        guard let data = image?.pngData() else { return }
+        let photo = Photo(data: data)
+        modelContext.insert(photo)
+        
     }
 }
 
